@@ -1,0 +1,96 @@
+classDiagram
+    direction LR
+    namespace modelo {
+        class Torneo {
+            <<Serializable>>
+            -nombre : String
+            -equipos : ArrayList~Equipo~
+            -etapas : LinkedHashMap#60;Etapa, List#60;Partido#62;#62;
+            -campeon : Equipo
+            -fechaSorteo : LocalDateTime
+            -sorteador : Sorteador «transient»
+            +conEquiposDeLaLiga()$ Torneo
+            +agregarEquipo(e : Equipo) void
+            +eliminarEquipo(nombre : String) boolean
+            +realizarSorteo() void
+            -jugarEtapas(clasificados : List~Equipo~) void
+        }
+        class Sorteador {
+            -random : Random
+            +validarCantidad(n : int) void
+            +sortearEtapa(equipos, etapa) List~Partido~
+            +emparejar(bombo, partidos, yaSorteados, etapa) void
+        }
+        class Partido {
+            <<Serializable>>
+            -etapa : Etapa
+            -local : Equipo
+            -visitante : Equipo
+            -golesLocal : int
+            -golesVisitante : int
+            -porPenales : boolean
+            -ganador : Equipo
+            +jugar(random : Random) void
+        }
+        class Equipo {
+            <<Serializable>>
+            -nombre : String
+            -ciudad : String
+        }
+        class Etapa {
+            <<enumeration>>
+            OCTAVOS
+            CUARTOS
+            SEMIFINAL
+            FINAL
+            +segunCantidad(n : int)$ Etapa
+        }
+        class LigaPro {
+            +equiposIniciales()$ List~Equipo~
+        }
+    }
+    namespace modelo.excepciones {
+        class NumeroEquiposInvalidoException {
+            -cantidad : int
+            +NumeroEquiposInvalidoException(mensaje : String)
+        }
+        class SorteoInvalidoException {
+            +SorteoInvalidoException(mensaje : String)
+        }
+    }
+    namespace modelo.persistencia {
+        class ArchivoTorneo {
+            -ruta : String
+            +guardar(t : Torneo) void
+            +cargar() Torneo
+        }
+    }
+    namespace controlador {
+        class TorneoController {
+            -torneo : Torneo
+            +iniciar() void
+        }
+    }
+    namespace vista {
+        class VistaConsola {
+            +mostrarMenu() int
+            +mostrarEquipos(lista) void
+            +mostrarSorteo(...) void
+            +mostrarError(msg : String) void
+        }
+    }
+    class Exception
+    Exception <|-- NumeroEquiposInvalidoException
+    Exception <|-- SorteoInvalidoException
+    Torneo "1" o-- "2..16" Equipo : equipos
+    Torneo "1" *-- "0..15" Partido : partidos por etapa
+    Torneo --> Sorteador : usa
+    Partido --> Etapa
+    Partido --> "2" Equipo
+    Torneo ..> LigaPro
+    Sorteador ..> NumeroEquiposInvalidoException : lanza
+    Sorteador ..> SorteoInvalidoException : lanza
+    ArchivoTorneo ..> Torneo : serializa
+    TorneoController --> VistaConsola
+    TorneoController --> Torneo
+    TorneoController --> ArchivoTorneo
