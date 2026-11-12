@@ -1,0 +1,14 @@
+# Compilados
+bin/
+out/
+*.class
+
+# Archivo que genera el programa al guardar el torneo
+*.ser
+
+# IDE / sistema
+.metadata/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
